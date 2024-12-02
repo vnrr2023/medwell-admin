@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (username, password) => {
-    if (username === 'rehan' && password === 'medwell') {
+    if (username === 'a' && password === 'a') {
       setUser({ username });
       return true;
     }

@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
     logout();
     navigate('/');
   };
-
+ 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -28,8 +28,8 @@ const Layout = ({ children }) => {
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">Medwell Admin</h2>
           <nav className="mt-10">
             <Link to="/home" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/home' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Dashboard</Link>
-            <Link to="/users" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/users' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Users</Link>
-            <Link to="/reports" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/reports' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Reports</Link>
+            <Link to="/requests" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/requests' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Requests</Link>
+            <Link to="/manage" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/manage' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Manage</Link>
             <Link to="/settings" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/settings' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Settings</Link>
           </nav>
           <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center space-x-2">

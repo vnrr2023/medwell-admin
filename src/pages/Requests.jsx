@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, X, Hospital, User } from 'lucide-react'
+import { Check, X, Hospital, User, FileText } from 'lucide-react'
+import { Document, Page, pdfjs } from 'react-pdf'
 import Layout from '../components/Layout'
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 const mockUsers = [
   { 
@@ -14,13 +17,30 @@ const mockUsers = [
     age: 45,
     experience: '15 years',
     education: 'St. Xaviers',
-    languages: 'English, Spanish',
-    availability: 'Mon-Fri, 9AM-5PM',
+    languages: 'English',
     certifications: 'Board Certified in Cardiology',
-    publications: '25+ peer-reviewed articles',
+    publications: 'DIS ki book',
     researchInterests: 'Uska Heart',
     professionalMemberships: 'Anjuman Medical Engineers',
-    awards: 'Oscar'
+    awards: 'Oscar',
+    documents: [
+      { 
+        name: 'Medical License',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Board Certification',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Aadhar Card',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Resume',
+        url: 'No Pdf Available'
+      }
+    ]
   },
   { 
     id: 2, 
@@ -35,7 +55,17 @@ const mockUsers = [
     parkingAvailable: 'Yes',
     insuranceAccepted: 'Yes',
     medicalSchool: 'Yes',
-    wheelchairFacilities: 'Yes'
+    wheelchairFacilities: 'Yes',
+    documents: [
+      {
+        name: 'Hospital License',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Accreditation Certificate',
+        url: 'No Pdf Available'
+      }
+    ]
   },
   { 
     id: 3, 
@@ -44,16 +74,33 @@ const mockUsers = [
     specialty: 'Pediatrics', 
     email: 'jane.smith@example.com', 
     phone: '456-789-0123',
-    age: 45,
-    experience: '15 years',
-    education: 'St. Xaviers',
-    languages: 'English, Spanish',
-    availability: 'Mon-Fri, 9AM-5PM',
-    certifications: 'Board Certified in Cardiology',
-    publications: '25+ peer-reviewed articles',
-    researchInterests: 'Uska Heart',
-    professionalMemberships: 'Anjuman Medical Engineers',
-    awards: 'Oscar'
+    age: 38,
+    experience: '10 years',
+    education: 'University of Mumbai',
+    languages: 'English, Hindi',
+    certifications: 'Board Certified in Pediatrics',
+    publications: 'Child Health in Urban India',
+    researchInterests: 'Childhood Obesity Prevention',
+    professionalMemberships: 'Indian Academy of Pediatrics',
+    awards: 'Young Researcher Award 2022',
+    documents: [
+      { 
+        name: 'Medical License',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Board Certification',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Aadhar Card',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Resume',
+        url: 'No Pdf Available'
+      }
+    ]
   },
   { 
     id: 4, 
@@ -62,21 +109,32 @@ const mockUsers = [
     location: 'Los Angeles', 
     email: 'info@countymedical.com', 
     phone: '321-654-0987',
-    beds: 500,
+    beds: 300,
     emergencyServices: 'Yes',
     specialties: 'All',
     parkingAvailable: 'Yes',
     insuranceAccepted: 'Yes',
     medicalSchool: 'Yes',
-    wheelchairFacilities: 'Yes'
+    wheelchairFacilities: 'Yes',
+    documents: [
+      {
+        name: 'Hospital License',
+        url: 'No Pdf Available'
+      },
+      {
+        name: 'Accreditation Certificate',
+        url: 'No Pdf Available'
+      }
+    ]
   },
 ]
 
-const Requests = () => {
+const Users = () => {
   const [users, setUsers] = useState(mockUsers)
   const [filter, setFilter] = useState('all')
   const [modalContent, setModalContent] = useState(null)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedDocument, setSelectedDocument] = useState(null)
 
   const filteredUsers = filter === 'all' ? users : users.filter(user => user.type === filter)
 
@@ -101,7 +159,21 @@ const Requests = () => {
   }
 
   const handleRowClick = (user) => {
-    setSelectedUser(selectedUser?.id === user.id ? null : user)
+    if (selectedUser?.id === user.id) {
+      setSelectedUser(null)
+      setSelectedDocument(null)
+    } else {
+      setSelectedUser(user)
+      setSelectedDocument(null)
+    }
+  }
+
+  const handleDocumentClick = (doc, event) => {
+    event.stopPropagation()
+    setSelectedDocument(selectedDocument === doc ? null : doc)
+  }
+
+  const onDocumentLoadSuccess = () => {
   }
 
   return (
@@ -164,45 +236,138 @@ const Requests = () => {
                             animate={{ y: 0 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                           >
-                            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">{user.name} Details</h3>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-8">
                               <div>
-                                <p className="text-base text-gray-600 dark:text-gray-300"><strong>Email:</strong> {user.email}</p>
-                                <p className="text-base text-gray-600 dark:text-gray-300"><strong>Phone:</strong> {user.phone}</p>
-                                {user.type === 'doctor' ? (
-                                  <>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Age:</strong> {user.age}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Experience:</strong> {user.experience}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Education:</strong> {user.education}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Certifications:</strong> {user.certifications}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Languages:</strong> {user.languages}</p>
-                                  </>
-                                ) : (
-                                  <>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Beds:</strong> {user.beds}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Emergency Services:</strong> {user.emergencyServices}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Specialties:</strong> {user.specialties}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Parking Available:</strong> {user.parkingAvailable}</p>
-                                  </>
-                                )}
+                                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Key Information</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <p className="text-base text-gray-600 dark:text-gray-300">
+                                      <strong>Name:</strong> {user.name}
+                                    </p>
+                                    <p className="text-base text-gray-600 dark:text-gray-300">
+                                      <strong>Email:</strong> {user.email}
+                                    </p>
+                                    <p className="text-base text-gray-600 dark:text-gray-300">
+                                      <strong>Phone:</strong> {user.phone}
+                                    </p>
+                                    {user.type === 'doctor' ? (
+                                      <>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Age:</strong> {user.age}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Specialty:</strong> {user.specialty}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Experience:</strong> {user.experience}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Education:</strong> {user.education}
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Location:</strong> {user.location}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Beds:</strong> {user.beds}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Emergency Services:</strong> {user.emergencyServices}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Specialties:</strong> {user.specialties}
+                                        </p>
+                                      </>
+                                    )}
+                                  </div>
+                                  <div className="space-y-2">
+                                    {user.type === 'doctor' ? (
+                                      <>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Languages:</strong> {user.languages}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Certifications:</strong> {user.certifications}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Publications:</strong> {user.publications}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Research Interests:</strong> {user.researchInterests}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Professional Memberships:</strong> {user.professionalMemberships}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Awards:</strong> {user.awards}
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Parking Available:</strong> {user.parkingAvailable}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Insurance Accepted:</strong> {user.insuranceAccepted}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Medical School:</strong> {user.medicalSchool}
+                                        </p>
+                                        <p className="text-base text-gray-600 dark:text-gray-300">
+                                          <strong>Wheelchair Facilities:</strong> {user.wheelchairFacilities}
+                                        </p>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                               <div>
-                                {user.type === 'doctor' ? (
-                                  <>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Availability:</strong> {user.availability}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Publications:</strong> {user.publications}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Research Interests:</strong> {user.researchInterests}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Professional Memberships:</strong> {user.professionalMemberships}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Awards:</strong> {user.awards}</p>
-                                  </>
-                                ) : (
-                                  <>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Insurance Accepted:</strong> {user.insuranceAccepted}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Medical School:</strong> {user.medicalSchool}</p>
-                                    <p className="text-base text-gray-600 dark:text-gray-300"><strong>Wheelchair Facilities:</strong> {user.wheelchairFacilities}</p>
-                                  </>
-                                )}
+                                <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Documents</h4>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                  {user.documents.map((doc, index) => (
+                                    <button
+                                      key={index}
+                                      onClick={(e) => handleDocumentClick(doc, e)}
+                                      className={`flex flex-col items-center justify-center p-4 rounded-md transition-colors ${
+                                        selectedDocument === doc
+                                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100'
+                                          : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                      }`}
+                                    >
+                                      <FileText className="w-8 h-8 mb-2" />
+                                      <span className="text-sm text-center">{doc.name}</span>
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
+                              {selectedDocument && selectedDocument.url !== 'No Pdf Available' && (
+                                <div className="mt-6">
+                                  <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                                    {selectedDocument.name}
+                                  </h4>
+                                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 h-[600px] overflow-auto">
+                                    <Document
+                                      file={selectedDocument.url}
+                                      onLoadSuccess={onDocumentLoadSuccess}
+                                      className="max-w-full"
+                                    >
+                                      <Page pageNumber={1} width={Math.min(600, window.innerWidth - 64)} />
+                                    </Document>
+                                  </div>
+                                </div>
+                              )}
+                              {selectedDocument && selectedDocument.url === 'No Pdf Available' && (
+                                <div className="mt-6">
+                                  <h4 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                                    {selectedDocument.name}
+                                  </h4>
+                                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center justify-center">
+                                    <p className="text-gray-600 dark:text-gray-300">No PDF available for this document.</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         </td>
@@ -241,5 +406,5 @@ const Requests = () => {
   )
 }
 
-export default Requests
+export default Users
 

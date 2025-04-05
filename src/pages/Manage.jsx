@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, X, Hospital, User, FileText, Users, Briefcase } from "lucide-react"
 import { Document, Page, pdfjs } from "react-pdf"
@@ -112,13 +112,76 @@ const mockUsers = [
 ]
 
 const Manage = () => {
-  const [users, setUsers] = useState(mockUsers)
+  const [users, setUsers] = useState([])
   const [filter, setFilter] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
   const [modalContent, setModalContent] = useState(null)
   const [selectedUser, setSelectedUser] = useState(null)
   const [selectedDocument, setSelectedDocument] = useState(null)
 
-  const filteredUsers = filter === "all" ? users : users.filter((user) => user.type === filter)
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('https://medwell-admin-backend.vercel.app/api/users/getUser')
+      const result = await response.json()
+      
+      if (result.data && Array.isArray(result.data)) {
+        const verifiedUsers = result.data.filter(user => user.verified === true)
+        
+        const transformedUsers = verifiedUsers.map(user => ({
+          id: user.id,
+          name: user.name || 'Unknown',
+          type: 'doctor', 
+          specialty: user.speciality || 'Not specified',
+          email: user.user_id, 
+          phone: user.phone_number || 'N/A',
+          age: null,
+          experience: null,
+          education: user.education || 'Not specified',
+          documents: [
+            {
+              name: 'Registration Card',
+              url: user.registeration_card_image || 'No Pdf Available'
+            },
+            {
+              name: 'Aadhar Card',
+              url: user.adhaar_card || 'No Pdf Available'
+            },
+            {
+              name: 'Profile Picture',
+              url: user.profile_pic || 'No Pdf Available'
+            }
+          ],
+          verified: user.verified,
+          submitted_at: user.submitted_at
+        }))
+        setUsers(transformedUsers)
+      } else {
+        console.warn('API response is not in expected format')
+        setUsers([])
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      setUsers([])
+    }
+  }
+
+  const filteredUsers = filter === "all" 
+    ? users.filter(user => 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.phone.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : users.filter((user) => 
+        user.type === filter && (
+          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.phone.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
 
   const handleRowClick = (user) => {
     if (selectedUser?.id === user.id) {
@@ -157,7 +220,16 @@ const Manage = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-4 flex justify-between items-center gap-4">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+            />
+          </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}

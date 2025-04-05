@@ -1,4 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react"
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 const AuthContext = createContext(null)
 
@@ -8,27 +13,32 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [darkMode, setDarkMode] = useState(true) 
 
-  const users = {
-    Vivek: { password: "Lavanya", phone: "+91 75063 75933", email: "vivek@gmail.com" },
-    Nishi: { password: "Nabila", phone: "+91 93240 52342", email: "nishi@gmail.com" },
-    Rehan: { password: "Ayesha", phone: "+91 98331 65762", email: "rehan@gmail.com" },
-    Rohit: { password: "koi nahi hai", phone: "+91 98923 62829", email: "rohit@gmail.com" },
-  }
-
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark")
     }
   }, [])
 
-  const login = (username, password) => {
-    const userKey = Object.keys(users).find((key) => key.toLowerCase() === username.toLowerCase())
-    const user = users[userKey]
-    if (user && user.password === password) {
-      setUser({ username: userKey, ...user })
-      return true
+  const login = async (username, password) => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .single()
+
+      if (error) throw error
+
+      if (data) {
+        setUser(data)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Login error:', error)
+      return false
     }
-    return false
   }
 
   const logout = () => {
@@ -40,13 +50,24 @@ export const AuthProvider = ({ children }) => {
     document.documentElement.classList.toggle("dark")
   }
 
-  const updateUserContact = (newPhone, newEmail) => {
+  const updateUserContact = async (newPhone, newEmail) => {
     if (user) {
-      setUser((prevUser) => ({
-        ...prevUser,
-        phone: newPhone,
-        email: newEmail,
-      }))
+      try {
+        const { data, error } = await supabase
+          .from('admin_users')
+          .update({ phone: newPhone, email: newEmail })
+          .eq('id', user.id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        if (data) {
+          setUser(data)
+        }
+      } catch (error) {
+        console.error('Update error:', error)
+      }
     }
   }
 

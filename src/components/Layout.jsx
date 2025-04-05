@@ -59,13 +59,10 @@ const Layout = ({ children }) => {
                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 dark:text-gray-200 focus:outline-none focus:text-gray-700 dark:focus:text-gray-300 md:hidden mr-4">
                   <Menu className="h-6 w-6" />
                 </button>
-                <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">{location.pathname.charAt(1).toUpperCase() + location.pathname.slice(2)}</h1>
+                <h1 className="text-2xl font-semibold text-gray-800 dark:text-white"></h1>
               </div>
-              <div className="relative w-full max-w-xs">
-                <input type="text" placeholder="Search..." className="w-full bg-gray-200 dark:bg-gray-700 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
-                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                </svg>
+              <div className="relative w-full max-w-xs"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+               
               </div>
             </div>
           </header>

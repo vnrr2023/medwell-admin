@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import Layout from '../components/Layout';
-import { FileText, Calendar, Users, IndianRupee, Server, Star, Shield, AlertTriangle, HelpCircle } from 'lucide-react';
+import { FileText, Calendar, Users, IndianRupee, Star, Shield, AlertTriangle, HelpCircle } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -36,19 +36,6 @@ const mockData = {
     history: {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       data: [1400000, 1450000, 1520000, 1500000, 1550000, 1530000, 1500000]
-    }
-  },
-  systemHealth: {
-    history: {
-      labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-      data: [
-        300, 450, 600, 550, 700, 650, 800, 750, 900, 850, 0, 0, 
-        0, 100, 250, 400, 550, 500, 450, 400, 350, 300, 250, 200
-      ],
-      status: [
-        true, true, true, true, true, true, true, true, true, true, 
-        false, false, false, true, true, true, true, true, true, true, true, true, true, true
-      ]
     }
   },
   feedback: [
@@ -110,84 +97,6 @@ const lineChartOptions = {
   },
 };
 
-const SystemHealthCard = () => {
-  return (
-    <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">System Health</h3>
-      <div style={{ height: '300px' }}>
-        <Line
-          data={{
-            labels: mockData.systemHealth.history.labels,
-            datasets: [{
-              label: 'System Status',
-              data: mockData.systemHealth.history.data.map((value, index) => ({
-                x: mockData.systemHealth.history.labels[index],
-                y: value,
-                status: mockData.systemHealth.history.status[index]
-              })),
-              segment: {
-                borderColor: ctx => mockData.systemHealth.history.status[ctx.p0DataIndex] ? 
-                  'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
-              },
-              borderWidth: 2,
-              tension: 0,
-              pointRadius: 0,
-              pointHoverRadius: 0,
-            }]
-          }}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-              intersect: false,
-              mode: 'index'
-            },
-            scales: {
-              x: {
-                grid: {
-                  display: false,
-                  drawBorder: true,
-                },
-                ticks: {
-                  maxRotation: 0,
-                  autoSkip: true,
-                  maxTicksLimit: 12
-                }
-              },
-              y: {
-                grid: {
-                  display: true,
-                  drawBorder: true,
-                  borderDash: [2],
-                  color: 'rgba(0, 0, 0, 0.1)'
-                },
-                title: {
-                  display: true,
-                  text: 'Requests per Hour'
-                },
-                beginAtZero: true
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: (context) => {
-                    const status = context.raw.status ? 'Server Online' : 'Server Offline';
-                    return `${status}: ${context.raw.y} requests`;
-                  }
-                }
-              }
-            }
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
 const Dashboard = () => {
   const [selectedBugReport, setSelectedBugReport] = useState(null);
   const [selectedSupportRequest, setSelectedSupportRequest] = useState(null);
@@ -239,49 +148,49 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* System Health and Security */}
+        {/* Security and Feedback */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <SystemHealthCard />
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Security</h3>
             <div className="space-y-4">
               <h4 className="text-lg font-medium text-gray-600 dark:text-gray-400">Admin Sessions</h4>
               {mockData.security.adminSessions.map((session, index) => (
                 <div key={index} className="flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">{session.admin}</span>
-                  <span className="text-gray-500 dark:text-gray-400">{session.duration}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{session.admin}</span>
+                  <span className="text-gray-500 dark:text-gray-500">{session.duration}</span>
                 </div>
               ))}
               <div className="mt-4">
-                <h4 className="text-lg font-medium text-gray-600 dark:text-gray-400">Security Alerts</h4>
-                <p className="text-red-500">
-                  {mockData.security.incorrectLoginAttempts} incorrect login attempts detected
-                </p>
+                <h4 className="text-lg font-medium text-gray-600 dark:text-gray-400">Login Attempts</h4>
+                <div className="flex items-center mt-2">
+                  <AlertTriangle className="w-5 h-5 text-yellow-500 mr-2" />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {mockData.security.incorrectLoginAttempts} incorrect login attempts today
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Feedback */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Recent Feedback</h3>
-          <div className="space-y-4 max-h-80 overflow-y-auto">
-            {mockData.feedback.map((item) => (
-              <div key={item.id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-semibold text-gray-700 dark:text-gray-300">{item.user}</p>
-                    <p className="text-sm text-gray-500">{item.time}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 lg:col-span-2">
+            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Recent Feedback</h3>
+            <div className="space-y-4 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {mockData.feedback.map((item) => (
+                <div key={item.id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">{item.user}</p>
+                      <p className="text-sm text-gray-500">{item.time}</p>
+                    </div>
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${i < item.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill={i < item.rating ? 'currentColor' : 'none'} />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < item.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill={i < item.rating ? 'currentColor' : 'none'} />
-                    ))}
-                  </div>
+                  <p className="mt-2 text-gray-600 dark:text-gray-400">{item.comment}</p>
                 </div>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">{item.comment}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 

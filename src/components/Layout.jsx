@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Menu, X, LogOut } from 'lucide-react';
+import { Sun, Moon, Menu, X, LogOut, Server, LayoutDashboard, FileText, Users, Settings } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -27,10 +27,36 @@ const Layout = ({ children }) => {
           </button>
           <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">Medwell Admin</h2>
           <nav className="mt-10">
-            <Link to="/home" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/home' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Dashboard</Link>
-            <Link to="/requests" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/requests' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Requests</Link>
-            <Link to="/manage" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/manage' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Manage</Link>
-            <Link to="/settings" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/settings' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>Settings</Link>
+            <Link to="/home" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/home' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>
+              <div className="flex items-center">
+                <LayoutDashboard className="w-5 h-5 mr-2" />
+                Dashboard
+              </div>
+            </Link>
+            <Link to="/requests" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/requests' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>
+              <div className="flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
+                Requests
+              </div>
+            </Link>
+            <Link to="/manage" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/manage' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>
+              <div className="flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Manage
+              </div>
+            </Link>
+            <Link to="/servers" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/servers' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>
+              <div className="flex items-center">
+                <Server className="w-5 h-5 mr-2" />
+                Servers
+              </div>
+            </Link>
+            <Link to="/settings" className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === '/settings' ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-200 hover:bg-blue-500 hover:text-white'}`}>
+              <div className="flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                Settings
+              </div>
+            </Link>
           </nav>
           <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center space-x-2">
             <button

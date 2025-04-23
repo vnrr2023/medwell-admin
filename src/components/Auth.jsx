@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Auth = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem('auth_username') || '';
+  });
+  const [password, setPassword] = useState(() => {
+    return localStorage.getItem('auth_password') || '';
+  });
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login, darkMode } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = login(username, password);
+    const success = await login(username, password);
     if (success) {
+      localStorage.setItem('auth_username', username);
+      localStorage.setItem('auth_password', password);
       const from = location.state?.from?.pathname || '/home';
       navigate(from, { replace: true });
     } else {
@@ -62,7 +68,7 @@ const Auth = () => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Auth;

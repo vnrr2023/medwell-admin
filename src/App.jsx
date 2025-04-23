@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Requests from './pages/Requests';
 import Manage from './pages/Manage';
 import Settings from './pages/Settings';
+import Servers from './pages/Servers';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ function App() {
           <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
           <Route path="/manage" element={<ProtectedRoute><Manage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/servers" element={<ProtectedRoute><Servers /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
